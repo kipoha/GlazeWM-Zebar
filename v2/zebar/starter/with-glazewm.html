@@ -47,6 +47,9 @@
 
       function App() {
         const [output, setOutput] = useState(providers.outputMap);
+        const [title, setTitle] = useState('');
+        
+  const [animating, setAnimating] = useState(false);
 
         useEffect(() => {
           providers.onOutput(() => setOutput(providers.outputMap));
@@ -55,7 +58,17 @@
         const focusedWorkspace = output?.glazewm?.focusedWorkspace;
         const focusedWindowTitle = output?.glazewm?.focusedContainer?.title;
         const workspaceName = focusedWorkspace && focusedWorkspace.name;
-        const title = focusedWindowTitle || workspaceName;
+        const newTitle = focusedWindowTitle || workspaceName;
+
+        useEffect(() => {
+          if (newTitle !== title) {
+            setAnimating(true);
+            setTimeout(() => {
+              setTitle(newTitle);
+              setAnimating(false);
+            }, 250);
+          }
+        }, [newTitle, title]);
 
         // Get icon to show for current network status.
         function getNetworkIcon(networkOutput) {
@@ -179,22 +192,24 @@
                 )}
               </div>
 
-              <div className="kip-blocks">
                 {output.media && (
                   output.media.currentSession && (
-                    <div className="media">
-                      <i className="nf nf-md-music_note"></i>
-                      {output.media.currentSession.title} -{' '}
-                      {output.media.currentSession.artist}
+                    <div className="kip-blocks">
+                      <div className="media">
+                        <i className="nf nf-md-music_note"></i>
+                        {output.media.currentSession.title} -{' '}
+                        {output.media.currentSession.artist}
+                      </div>
                     </div>
                   )
                 )}
-              </div>
             </div>
 
             <div className="center">
               <div className="kip-blocks">
-                {title}
+                <div className={`title-animation ${animating ? 'title-animation' : 'title-animation-enter'}`}>
+                  {title}
+                </div>
               </div>
             </div>
 
